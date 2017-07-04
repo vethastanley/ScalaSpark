@@ -12,12 +12,18 @@ object LogAnalyser {
 
     val rawLogsRDD = context.textFile("C:\\SoftwareAG\\ARIS10.0\\server\\bin\\work\\work_ecp_m\\base\\logs\\ecp.log.txt.1")
     val logsRDD = rawLogsRDD.filter(l => (l.length - l.replace("|", "").length) == 7)
-    var tenantLogsMapRDD = logsRDD.map(_.split('|'))
-      .map(l => (l(3), LogEntry(l(0), l(1), l(2), l(3), l(5).toLong, l(6), l(7)))).groupByKey()
-    val temp = tenantLogsMapRDD.collect()
-    val tenantLogCountArr = tenantLogsMapRDD.map(tl=>(tl._1, tl._2.size)).collect()
+    val tenantLogsMapRDD = logsRDD.map(_.split('|'))
+      .map(l => (l(3), LogEntry(l(0), l(1), l(2), l(3), l(5).toLong, l(6), l(7))))
+      .groupByKey()
+
+    //See the amount logs generated for each tenant
+    val tenantLogCountArr = tenantLogsMapRDD.map(tl => (tl._1, tl._2.size)).collect()
     tenantLogCountArr.foreach(tuple => {
       println(tuple._1 + "=======>" + tuple._2)
     })
+
+    //See the amount of logs generated for each tenant with respect to the log level
+    val tenantLogLevelRDD = tenantLogsMapRDD.map(tenLog => (tenLog._1, tenLog._2.foreach(le => le.level))).mapValues(l => (l, 1)).groupByKey()
+    tenantLogLevelRDD.foreach(tll=>(tll._1, tll._2))
   }
 }
