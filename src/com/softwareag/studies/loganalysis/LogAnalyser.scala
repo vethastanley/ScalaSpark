@@ -23,6 +23,7 @@ object LogAnalyser {
     })
 
     //See the amount of logs generated for each tenant with respect to the log level
+    //--------------------------------------{(tenant, [level, level, level])}----------------------------
     val tenantLogLevelRDD = tenantLogsMapRDD.map(tenLog => (tenLog._1, tenLog._2.foreach(le => le.level))).mapValues(l => (l, 1)).groupByKey()
     tenantLogLevelRDD.foreach(tll=>(tll._1, tll._2))
   }
