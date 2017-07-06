@@ -14,6 +14,7 @@ object LogAnalyser {
     val logsRDD = rawLogsRDD.filter(l => (l.length - l.replace("|", "").length) == 7)
     val tenantLogsRDD = logsRDD.map(_.split('|'))
       .map(l => (l(3), LogEntry(l(0), l(1), l(2), l(3), l(5).toLong, l(6), l(7))))
+    println("Partition size ::" + tenantLogsRDD.partitions.size)
     val tenantLogsMapRDD = tenantLogsRDD.groupByKey()
 
     //See the amount logs generated for each tenant
